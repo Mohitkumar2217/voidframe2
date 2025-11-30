@@ -16,20 +16,14 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    setError(''); // Clear error when user types
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,33 +32,38 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:3001/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
+      if (!response.ok) {
+        setError('Unable to reach authentication server.');
+        return;
+      }
+
       const data = await response.json();
 
-      if (data.success) {
-        // Store token and user data
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        if (onLogin) {
-          onLogin(data.user);
-        }
+      // success logic
+      if (data.status === true) {
+        const token = data.data?.token;
+        const user = data.data?.user;
 
-        // Redirect to portal
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        if (onLogin) onLogin(user);
+
         router.push('/portal');
       } else {
-        setError(data.message || 'Login failed');
+        // backend sends: message / error / msg
+        setError(data.message || data.error || 'Invalid email or password.');
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('Unable to connect to authentication service. Please try again.');
+    } catch (err: any) {
+      setError('Failed to connect to server. Make sure backend is running.');
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -77,18 +76,26 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   return (
     <>
-      {/* Demo Credentials for Judges */}
+      {/* Demo Credentials */}
       <div className="mb-6 p-4 bg-blue-900/30 border border-blue-500/30 rounded-lg">
-        <h3 className="text-sm font-semibold text-blue-300 mb-3">Demo Accounts for Judges:</h3>
+        <h3 className="text-sm font-semibold text-blue-300 mb-3">
+          Demo Accounts for Judges:
+        </h3>
+
         <div className="space-y-2 text-xs">
-          <div className="cursor-pointer hover:bg-blue-800/20 p-2 rounded transition-colors"
-               onClick={() => fillCredentials('mdoner.admin@gov.in', 'MDoNER@2025')}>
+          <div
+            className="cursor-pointer hover:bg-blue-800/20 p-2 rounded transition-colors"
+            onClick={() => fillCredentials('mdoner.admin@gov.in', 'MDoNER@2025')}
+          >
             <span className="text-gray-300">MDoNER Admin (Click to fill):</span>
             <div className="text-blue-200">📧 HackRebel.nitsri.ac.in</div>
             <div className="text-blue-200">🔑 HackRebel@2025</div>
           </div>
-          <div className="border-t border-blue-500/20 pt-2 cursor-pointer hover:bg-blue-800/20 p-2 rounded transition-colors"
-               onClick={() => fillCredentials('client.user@project.in', 'Client@2025')}>
+
+          <div
+            className="border-t border-blue-500/20 pt-2 p-2 cursor-pointer hover:bg-blue-800/20 rounded transition-colors"
+            onClick={() => fillCredentials('client.user@project.in', 'Client@2025')}
+          >
             <span className="text-gray-300">Client User (Click to fill):</span>
             <div className="text-blue-200">📧 HackRebel-client.nitsri.ac.in</div>
             <div className="text-blue-200">🔑 HackRebel@2025</div>
@@ -133,19 +140,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             placeholder="Enter your password"
           />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500"
-            />
-            <span className="ml-2 text-sm text-gray-300">Remember me</span>
-          </label>
-          <a href="#" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
-            Forgot password?
-          </a>
         </div>
 
         <button
