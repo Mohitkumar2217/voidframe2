@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const DocumentSchema = new mongoose.Schema({
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "Client" },
@@ -7,4 +7,5 @@ const DocumentSchema = new mongoose.Schema({
   uploadedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Document", DocumentSchema);
+const Document = mongoose.model("Document", DocumentSchema);
+export default Document;

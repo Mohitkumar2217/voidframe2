@@ -1,10 +1,13 @@
-const express = require("express");
-const router = express.Router();
-const Document = require("../models/Document");
+import express from "express";
+import Document from "../models/Document.js";
 
-const cloudinary = require("cloudinary").v2;
-const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+import cloudinaryModule from "cloudinary";
+const cloudinary = cloudinaryModule.v2;
+
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+
+export const router = express.Router();
 
 // Cloudinary Config
 cloudinary.config({
@@ -40,4 +43,4 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

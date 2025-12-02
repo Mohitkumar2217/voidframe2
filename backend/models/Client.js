@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ClientSchema = new mongoose.Schema({
   name: String,
@@ -6,4 +6,5 @@ const ClientSchema = new mongoose.Schema({
   password: String, // simple string password
 });
 
-module.exports = mongoose.model("Client", ClientSchema);
+const Client = mongoose.model("Client", ClientSchema);
+export default Client;
