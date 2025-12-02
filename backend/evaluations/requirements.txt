@@ -10,3 +10,4 @@ faiss-cpu
 langchain-groq
 uvicorn
 python-dotenv
+python-multipart
