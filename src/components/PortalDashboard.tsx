@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, User } from "@/lib/auth";
@@ -601,3 +602,12 @@ const ClientDashboard: React.FC = () => {
 };
 
 export default PortalContent;
+=======
+import PortalContent from './PortalContent';
+
+export const PortalDashboard = () => {
+  return <PortalContent />;
+};
+
+export default PortalDashboard;
+>>>>>>> 0ccb67ac8ebce1e89dbe2a898e5f453e2f913a8a

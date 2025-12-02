@@ -2,6 +2,10 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+<<<<<<< HEAD
+=======
+  "type": "module",
+>>>>>>> 0ccb67ac8ebce1e89dbe2a898e5f453e2f913a8a
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -15,16 +19,25 @@
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
+<<<<<<< HEAD
     "cloudinary": "^1.41.3",
+=======
+    "cloudinary": "^2.8.0",
+>>>>>>> 0ccb67ac8ebce1e89dbe2a898e5f453e2f913a8a
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "framer-motion": "^12.23.22",
     "jsonwebtoken": "^9.0.2",
+<<<<<<< HEAD
     "mongoose": "^8.20.0",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
+=======
+    "mongoose": "^9.0.0",
+    "multer": "^2.0.2",
+>>>>>>> 0ccb67ac8ebce1e89dbe2a898e5f453e2f913a8a
     "next": "15.5.4",
     "next-pwa": "^5.6.0",
     "nodemailer": "^7.0.10",
@@ -47,6 +60,7 @@
     "@types/twilio": "^3.19.2",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "nodemon": "^3.1.11",
     "tailwindcss": "^4",
     "typescript": "^5.9.3"
   }

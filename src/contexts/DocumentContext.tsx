@@ -1,135 +1,140 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
+/* -----------------------------------------
+   DOCUMENT TYPE (Updated with evaluationData)
+------------------------------------------ */
 export interface UploadedDocument {
   id: string;
   name: string;
   size: number;
   uploadDate: string;
-  status: 'viewed' | 'under-review' | 'approved' | 'rejected' | 'pending';
+  status: "viewed" | "under-review" | "approved" | "rejected" | "pending";
   reviewerComments?: string;
+
   uploadedBy: {
     name: string;
     email: string;
-    department: string;
+    department?: string; // optional
   };
+
   reviewedBy?: {
     name: string;
     email: string;
   };
+
   reviewDate?: string;
+
+  evaluationData?: any; // ⭐ NEW FIELD for AI results
 }
 
+/* -----------------------------------------
+   CONTEXT TYPE
+------------------------------------------ */
 interface DocumentContextType {
   documents: UploadedDocument[];
-  addDocument: (document: Omit<UploadedDocument, 'id'>) => void;
-  updateDocumentStatus: (id: string, status: UploadedDocument['status'], comments?: string, reviewedBy?: { name: string; email: string }) => void;
+  addDocument: (document: Omit<UploadedDocument, "id">) => void;
+  updateDocumentStatus: (
+    id: string,
+    status: UploadedDocument["status"],
+    comments?: string,
+    reviewedBy?: { name: string; email: string }
+  ) => void;
   getClientDocuments: (clientEmail: string) => UploadedDocument[];
   getAllDocuments: () => UploadedDocument[];
 }
 
-const DocumentContext = createContext<DocumentContextType | undefined>(undefined);
+/* -----------------------------------------
+   INIT CONTEXT
+------------------------------------------ */
+const DocumentContext = createContext<DocumentContextType | undefined>(
+  undefined
+);
 
 export const useDocuments = () => {
   const context = useContext(DocumentContext);
   if (!context) {
-    throw new Error('useDocuments must be used within a DocumentProvider');
+    throw new Error("useDocuments must be used within a DocumentProvider");
   }
   return context;
 };
 
-export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+/* -----------------------------------------
+   PROVIDER
+------------------------------------------ */
+export const DocumentProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [documents, setDocuments] = useState<UploadedDocument[]>([
-    {
-      id: '1',
-      name: 'Project_DPR_Northeast_Development.pdf',
-      size: 2340000,
-      uploadDate: '2025-10-08',
-      status: 'approved',
-      reviewerComments: 'All requirements met. Project approved for implementation.',
-      uploadedBy: {
-        name: 'Project Client',
-        email: 'client.user@project.in',
-        department: 'Project Stakeholder'
-      },
-      reviewedBy: {
-        name: 'MDoNER Admin',
-        email: 'admin@mdoner.gov.in'
-      },
-      reviewDate: '2025-10-09'
-    },
-    {
-      id: '2',
-      name: 'Infrastructure_Assessment_Report.docx',
-      size: 1560000,
-      uploadDate: '2025-10-09',
-      status: 'under-review',
-      reviewerComments: 'Currently being reviewed by technical team.',
-      uploadedBy: {
-        name: 'Project Client',
-        email: 'client.user@project.in',
-        department: 'Project Stakeholder'
-      }
-    },
-    {
-      id: '3',
-      name: 'Environmental_Impact_Study.pdf',
-      size: 3200000,
-      uploadDate: '2025-10-10',
-      status: 'viewed',
-      reviewerComments: 'Document has been received and is in queue for review.',
-      uploadedBy: {
-        name: 'Project Client',
-        email: 'client.user@project.in',
-        department: 'Project Stakeholder'
-      }
-    }
+    // Example / sample data
   ]);
 
-  const addDocument = (document: Omit<UploadedDocument, 'id'>) => {
+  /* -----------------------------------------
+       ADD A DOCUMENT
+  ------------------------------------------ */
+  const addDocument = (document: Omit<UploadedDocument, "id">) => {
     const newDocument: UploadedDocument = {
       ...document,
       id: Date.now().toString(),
+
+      // If user forgot to include "uploadedBy", set default
+      uploadedBy: document.uploadedBy || {
+        name: "Client",
+        email: "client@system",
+        department: "Client",
+      },
     };
-    setDocuments(prev => [newDocument, ...prev]);
+
+    setDocuments((prev) => [newDocument, ...prev]);
   };
 
+  /* -----------------------------------------
+       UPDATE STATUS (Admin Only)
+  ------------------------------------------ */
   const updateDocumentStatus = (
-    id: string, 
-    status: UploadedDocument['status'], 
+    id: string,
+    status: UploadedDocument["status"],
     comments?: string,
     reviewedBy?: { name: string; email: string }
   ) => {
-    setDocuments(prev => prev.map(doc => 
-      doc.id === id 
-        ? { 
-            ...doc, 
-            status, 
-            reviewerComments: comments || doc.reviewerComments,
-            reviewedBy: reviewedBy || doc.reviewedBy,
-            reviewDate: new Date().toISOString().split('T')[0]
-          }
-        : doc
-    ));
+    setDocuments((prev) =>
+      prev.map((doc) =>
+        doc.id === id
+          ? {
+              ...doc,
+              status,
+              reviewerComments: comments ?? doc.reviewerComments,
+              reviewedBy: reviewedBy ?? doc.reviewedBy,
+              reviewDate: new Date().toISOString(),
+            }
+          : doc
+      )
+    );
   };
 
+  /* -----------------------------------------
+        FILTER BY CLIENT
+  ------------------------------------------ */
   const getClientDocuments = (clientEmail: string) => {
-    return documents.filter(doc => doc.uploadedBy.email === clientEmail);
+    return documents.filter((doc) => doc.uploadedBy.email === clientEmail);
   };
 
-  const getAllDocuments = () => {
-    return documents;
-  };
+  /* -----------------------------------------
+        RETURN ALL
+  ------------------------------------------ */
+  const getAllDocuments = () => documents;
 
   return (
-    <DocumentContext.Provider value={{
-      documents,
-      addDocument,
-      updateDocumentStatus,
-      getClientDocuments,
-      getAllDocuments
-    }}>
+    <DocumentContext.Provider
+      value={{
+        documents,
+        addDocument,
+        updateDocumentStatus,
+        getClientDocuments,
+        getAllDocuments,
+      }}
+    >
       {children}
     </DocumentContext.Provider>
   );
