@@ -42,22 +42,31 @@ export default function ChatbotPage() {
     setMessages((prev) => [...prev, { sender: "bot", text: "" }]);
     setIsStreaming(true);
 
-    const res = await fetch("http://127.0.0.1:8000/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: finalText }),
-    });
+    try {
+      const res = await fetch("/api/chat/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: finalText }),
+      });
 
-    const data = await res.json();
-    const formatted = data.answer || "No response from server.";
+      const data = await res.json();
+      const formatted = data.answer || "No response from server.";
 
-    setMessages((prev) => {
-      const updated = [...prev];
-      updated[updated.length - 1].text = formatted;
-      return updated;
-    });
-
-    setIsStreaming(false);
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1].text = formatted;
+        return updated;
+      });
+    } catch (error) {
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1].text = "Chat service is unavailable right now. Please try again.";
+        return updated;
+      });
+      console.error(error);
+    } finally {
+      setIsStreaming(false);
+    }
   };
 
   return (

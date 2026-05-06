@@ -98,7 +98,7 @@ export default function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0 opacity-10">
         <img
-          src="/images/northeast-map.svg"
+          src="/mdoner-logo-new.svg"
           alt="Northeast India Map"
           className="w-full h-full object-cover"
         />

@@ -36,15 +36,17 @@ const Navigation = () => {
   //-------------------------------------
   const loadNotifications = async () => {
     try {
-      const userId = auth.getUser(); // <--- CHANGE THIS if needed
+      const user = auth.getUser();
+      const userId = user?.id;
 
       if (!userId) return;
 
-      const res = await fetch(`http://localhost:3000/api/notifications/${userId}`);
+      const res = await fetch(`/api/notifications/${userId}`);
+      if (!res.ok) return;
       const data = await res.json();
 
       setNotifications(data);
-      setUnreadCount(data.filter((n: Notification[] ) => !n).length);
+      setUnreadCount(data.filter((n: Notification) => !n.read).length);
     } catch (err) {
       console.error('Failed to load notifications', err);
     }
@@ -57,7 +59,7 @@ const Navigation = () => {
     loadNotifications();
     const interval = setInterval(loadNotifications, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [pathname]);
 
   //-------------------------------------
   // Authentication Check

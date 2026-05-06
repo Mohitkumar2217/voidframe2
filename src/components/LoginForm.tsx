@@ -32,7 +32,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -47,9 +47,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       const data = await response.json();
 
       // success logic
-      if (data.status === true) {
-        const token = data.data?.token;
-        const user = data.data?.user;
+      if (data.success === true) {
+        const token = data.token;
+        const user = data.user;
 
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
@@ -62,7 +62,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         setError(data.message || data.error || 'Invalid email or password.');
       }
     } catch (err: any) {
-      setError('Failed to connect to server. Make sure backend is running.');
+      setError('Failed to connect to server.');
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);

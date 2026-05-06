@@ -170,6 +170,7 @@ const ClientDashboard: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] =
     useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [uploadMessage, setUploadMessage] = useState<string>('');
   const [evaluation, setEvaluation] = useState<any>(null);
   const [issues, setIssues] = useState<any[]>([]);
   const [reviewedPdfUrl, setReviewedPdfUrl] = useState<string | null>(null);
@@ -181,37 +182,23 @@ const ClientDashboard: React.FC = () => {
   const handleUpload = async () => {
     if (!selectedFile) return
     setUploadStatus("uploading");
+    setUploadMessage('');
 
     try {
-      // FASTAPI upload
       const form = new FormData();
       form.append("file", selectedFile);
 
-      const res = await fetch("http://localhost:8000/upload_dpr", {
+      const res = await fetch("/api/dpr/upload", {
         method: "POST",
         body: form,
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error("AI server failed");
+      if (!res.ok) throw new Error(data.message || "Upload failed");
 
       setEvaluation(data.evaluation);
       setIssues(data.issues);
-      setReviewedPdfUrl(`http://localhost:8000/${data.highlighted_pdf}`);
-
-      // Save to Node backend
-      const backend = new FormData();
-      backend.append("file", selectedFile);
-      backend.append("title", selectedFile.name);
-      backend.append("analysis", JSON.stringify(data));
-
-      await fetch("http://localhost:3001/api/dpr/upload", {
-        method: "POST",
-        body: backend,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      setReviewedPdfUrl(data.highlightedPdfUrl || null);
 
       // Local UI state
       addDocument({
@@ -228,9 +215,11 @@ const ClientDashboard: React.FC = () => {
       });
 
       setUploadStatus("success");
+      setUploadMessage(data.message || 'Document uploaded and analyzed.');
     } catch (err) {
       console.error(err);
       setUploadStatus("error");
+      setUploadMessage('Upload failed. Please try again.');
     }
   };
 
@@ -259,6 +248,11 @@ const ClientDashboard: React.FC = () => {
           >
             {uploadStatus === "uploading" ? "Analyzing..." : "Upload & Analyze"}
           </button>
+        )}
+        {uploadMessage && (
+          <p className={`mt-4 text-sm ${uploadStatus === 'error' ? 'text-red-300' : 'text-green-300'}`}>
+            {uploadMessage}
+          </p>
         )}
       </div>
 
