@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -91,16 +92,17 @@ export default function HeroSection() {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [languages.length]);
 
   return (
     <AuroraBackground id="home" className="relative h-screen w-full overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0 opacity-10">
-        <img
+        <Image
           src="/mdoner-logo-new.svg"
           alt="Northeast India Map"
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
       </div>
 

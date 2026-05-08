@@ -23,10 +23,21 @@ const users = [
   }
 ];
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dpr_assessment_system_secret_key_2025';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request: NextRequest) {
   try {
+    if (!JWT_SECRET) {
+      console.error('JWT_SECRET is not configured');
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Authentication service is not configured'
+        },
+        { status: 500 }
+      );
+    }
+
     const { email, password } = await request.json();
 
     // Find user by email

@@ -10,21 +10,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Query is required' }, { status: 400 });
     }
 
-    const aiBaseUrl = process.env.AI_API_BASE_URL || 'http://127.0.0.1:8000';
+    const aiBaseUrl = process.env.AI_API_BASE_URL?.trim().replace(/\/$/, '');
 
-    try {
-      const upstream = await fetch(`${aiBaseUrl}/ask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
+    if (aiBaseUrl) {
+      try {
+        const upstream = await fetch(`${aiBaseUrl}/ask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+        });
 
-      if (upstream.ok) {
-        const data = await upstream.json();
-        return NextResponse.json({ answer: data.answer || FALLBACK_ANSWER });
+        if (upstream.ok) {
+          const data = await upstream.json();
+          return NextResponse.json({ answer: data.answer || FALLBACK_ANSWER });
+        }
+      } catch {
+        // fall through to local fallback response
       }
-    } catch {
-      // fall through to local fallback response
     }
 
     return NextResponse.json({ answer: FALLBACK_ANSWER });

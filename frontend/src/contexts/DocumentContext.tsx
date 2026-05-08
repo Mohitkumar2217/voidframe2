@@ -26,7 +26,7 @@ export interface UploadedDocument {
 
   reviewDate?: string;
 
-  evaluationData?: any; // ⭐ NEW FIELD for AI results
+  evaluationData?: Record<string, unknown>; // ⭐ NEW FIELD for AI results
 }
 
 /* -----------------------------------------

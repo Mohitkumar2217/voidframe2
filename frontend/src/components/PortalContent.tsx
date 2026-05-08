@@ -97,10 +97,10 @@ const MDoNERDashboard: React.FC = () => {
 
       {/* Filter Buttons */}
       <div className="flex gap-3 mb-8">
-        {['all', ...Object.keys(counts)].map(f => (
+        {(['all', ...Object.keys(counts)] as Array<'all' | UploadedDocument['status']>).map(f => (
           <button
             key={f}
-            onClick={() => setSelectedFilter(f as any)}
+            onClick={() => setSelectedFilter(f)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all
               ${
                 selectedFilter === f
@@ -171,13 +171,11 @@ const ClientDashboard: React.FC = () => {
   const [uploadStatus, setUploadStatus] =
     useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [uploadMessage, setUploadMessage] = useState<string>('');
-  const [evaluation, setEvaluation] = useState<any>(null);
-  const [issues, setIssues] = useState<any[]>([]);
+  const [evaluation, setEvaluation] = useState<string | null>(null);
   const [reviewedPdfUrl, setReviewedPdfUrl] = useState<string | null>(null);
 
-  const { addDocument, getClientDocuments } = useDocuments();
+  const { addDocument } = useDocuments();
   const user = auth.getUser();
-  const myDocs = user ? getClientDocuments(user.email) : [];
 
   const handleUpload = async () => {
     if (!selectedFile) return
@@ -197,7 +195,6 @@ const ClientDashboard: React.FC = () => {
       if (!res.ok) throw new Error(data.message || "Upload failed");
 
       setEvaluation(data.evaluation);
-      setIssues(data.issues);
       setReviewedPdfUrl(data.highlightedPdfUrl || null);
 
       // Local UI state

@@ -19,10 +19,21 @@ const users = [
   }
 ];
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dpr_assessment_system_secret_key_2025';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function GET(request: NextRequest) {
   try {
+    if (!JWT_SECRET) {
+      console.error('JWT_SECRET is not configured');
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Authentication service is not configured'
+        },
+        { status: 500 }
+      );
+    }
+
     const authHeader = request.headers.get('authorization');
     const token = authHeader && authHeader.split(' ')[1];
 

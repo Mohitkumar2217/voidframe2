@@ -11,6 +11,8 @@ interface AuroraBackgroundProps extends React.HTMLProps<HTMLDivElement> {
   slideshowInterval?: number; // seconds
 }
 
+const BACKGROUND_IMAGES = ["/image4.png", "/image1.png", "/image2.png", "/image3.png", "/image5.jpg"];
+
 export const AuroraBackground = ({
   className,
   children,
@@ -19,12 +21,11 @@ export const AuroraBackground = ({
   slideshowInterval = 6,
   ...props
 }: AuroraBackgroundProps) => {
-  const images = ["/image4.png", "/image1.png" ,"/image2.png", "/image3.png" , "/image5.jpg"];
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
+      setCurrentIndex((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
     }, slideshowInterval * 1000);
     return () => clearInterval(interval);
   }, [slideshowInterval]);
@@ -40,7 +41,7 @@ export const AuroraBackground = ({
       >
         {/* Background images slideshow */}
         <div className="absolute inset-0">
-          {images.map((src, index) => (
+          {BACKGROUND_IMAGES.map((src, index) => (
             <Image
               key={index}
               src={src}

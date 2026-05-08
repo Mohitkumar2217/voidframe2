@@ -61,7 +61,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         // backend sends: message / error / msg
         setError(data.message || data.error || 'Invalid email or password.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Failed to connect to server.');
       console.error('Login error:', err);
     } finally {

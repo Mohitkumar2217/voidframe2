@@ -11,55 +11,8 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeSection, setActiveSection] = useState("");
   const router = useRouter();
   const pathname = usePathname();
-
-  //-------------------------------------
-  // 🔔 Notification System State
-  //-------------------------------------
-  interface Notification {
-    id: number;
-    userId: number;
-    message: string;
-    read: boolean;
-    createdAt: string;
-  }
-
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-
-  //-------------------------------------
-  // 🔔 Fetch Notifications Function
-  //-------------------------------------
-  const loadNotifications = async () => {
-    try {
-      const user = auth.getUser();
-      const userId = user?.id;
-
-      if (!userId) return;
-
-      const res = await fetch(`/api/notifications/${userId}`);
-      if (!res.ok) return;
-      const data = await res.json();
-
-      setNotifications(data);
-      setUnreadCount(data.filter((n: Notification) => !n.read).length);
-    } catch (err) {
-      console.error('Failed to load notifications', err);
-    }
-  };
-
-  //-------------------------------------
-  // 🔔 Poll every 10 seconds
-  //-------------------------------------
-  useEffect(() => {
-    loadNotifications();
-    const interval = setInterval(loadNotifications, 10000);
-    return () => clearInterval(interval);
-  }, [pathname]);
 
   //-------------------------------------
   // Authentication Check
@@ -89,7 +42,6 @@ const Navigation = () => {
     const element = document.getElementById(targetId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setActiveSection(targetId);
     }
   };
 
@@ -106,14 +58,6 @@ const Navigation = () => {
   ];
 
   const [currentLanguage, setCurrentLanguage] = useState(languages[0]);
-
-  useEffect(() => {
-    setIsAuthenticated(auth.isAuthenticated());
-
-    const storageListener = () => setIsAuthenticated(auth.isAuthenticated());
-    window.addEventListener("storage", storageListener);
-    return () => window.removeEventListener("storage", storageListener);
-  }, [pathname]);
 
   const handleLogout = () => {
     auth.logout();

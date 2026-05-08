@@ -6,8 +6,10 @@ export default function useNotifications(userId) {
 
   useEffect(() => {
     if (!userId) return;
+    const socketUrl =
+      process.env.NEXT_PUBLIC_NOTIFICATION_SOCKET_URL || window.location.origin;
 
-    const socket = io("http://localhost:5000", {
+    const socket = io(socketUrl, {
       query: { userId },
     });
 

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'File is required' }, { status: 400 });
     }
 
-    const aiBaseUrl = process.env.AI_API_BASE_URL || 'http://127.0.0.1:8000';
+    const aiBaseUrl = process.env.AI_API_BASE_URL?.trim().replace(/\/$/, '');
 
     let evaluation =
       `Automated review completed for "${file.name}".\n\n` +
@@ -30,25 +30,27 @@ export async function POST(request: NextRequest) {
     let issues: string[] = [];
     let highlightedPdfUrl: string | null = null;
 
-    try {
-      const upstreamForm = new FormData();
-      upstreamForm.append('file', file);
+    if (aiBaseUrl) {
+      try {
+        const upstreamForm = new FormData();
+        upstreamForm.append('file', file);
 
-      const upstream = await fetch(`${aiBaseUrl}/upload_dpr`, {
-        method: 'POST',
-        body: upstreamForm,
-      });
+        const upstream = await fetch(`${aiBaseUrl}/upload_dpr`, {
+          method: 'POST',
+          body: upstreamForm,
+        });
 
-      if (upstream.ok) {
-        const data = await upstream.json();
-        evaluation = data.evaluation || evaluation;
-        issues = data.issues || [];
-        if (data.highlighted_pdf) {
-          highlightedPdfUrl = `${aiBaseUrl}/${data.highlighted_pdf}`;
+        if (upstream.ok) {
+          const data = await upstream.json();
+          evaluation = data.evaluation || evaluation;
+          issues = data.issues || [];
+          if (data.highlighted_pdf) {
+            highlightedPdfUrl = `${aiBaseUrl}/${data.highlighted_pdf}`;
+          }
         }
+      } catch {
+        // If AI service is down, return local evaluation instead.
       }
-    } catch {
-      // If AI service is down, return local evaluation instead.
     }
 
     uploads.unshift({
