@@ -10,10 +10,10 @@ export const login = async (req, res) => {
     return res.status(400).json({ message: "Email and password required." });
 
   try {
-    // 1️⃣ Try User (email login)
+    // Try User (email login)
     let account = await User.findOne({ email });
 
-    // 2️⃣ Try Admin (username login using same input)
+    // Try Admin (username login using same input)
     if (!account) {
       account = await Admin.findOne({ username: email });
     }

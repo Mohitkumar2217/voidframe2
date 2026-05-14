@@ -69,10 +69,8 @@ def load_all_documents(data_dir: str) -> List[Any]:
     print(f"[DEBUG] Total loaded docs: {len(documents)}")
     return documents
 
-
-# ------------------------------------------------------------------
-# ⭐ NEW: load_single_pdf() for DPR upload
-# ------------------------------------------------------------------
+ 
+# NEW: load_single_pdf() for DPR upload 
 def load_single_pdf(pdf_path: str):
     """
     Load a single DPR PDF and return LangChain documents.

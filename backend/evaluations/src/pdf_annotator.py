@@ -2,10 +2,8 @@ import fitz
 import os
 import uuid
 
-
-# --------------------------------------------------------------------
-# Highlight issue on *page*
-# --------------------------------------------------------------------
+ 
+# Highlight issue on *page* 
 def highlight_issue_on_page(page, snippet, severity, comment_text):
     """
     Adds highlight + attached comment to a specific page.
@@ -41,10 +39,8 @@ def highlight_issue_on_page(page, snippet, severity, comment_text):
             print(f"[ANNOTATION ERROR] {e}")
             continue
 
-
-# --------------------------------------------------------------------
-# Add legend on page 1
-# --------------------------------------------------------------------
+ 
+# Add legend on page 1 
 def add_legend(page):
     legend = """
 AI ISSUE SEVERITY LEGEND
@@ -64,10 +60,8 @@ AI ISSUE SEVERITY LEGEND
         fill=(0, 0, 0, 0.65),  # translucent black box
     )
 
-
-# --------------------------------------------------------------------
-# Master function: Annotate full PDF
-# --------------------------------------------------------------------
+ 
+# Master function: Annotate full PDF 
 def annotate_pdf(input_path, issues):
     """
     Adds:
@@ -78,15 +72,11 @@ def annotate_pdf(input_path, issues):
     """
 
     doc = fitz.open(input_path)
-
-    # --------------------------
-    # Insert severity legend
-    # --------------------------
+ 
+    # Insert severity legend 
     add_legend(doc[0])
-
-    # --------------------------
-    # Apply highlights for each issue
-    # --------------------------
+ 
+    # Apply highlights for each issue 
     for issue in issues:
         try:
             page_number = issue.get("page")
@@ -106,10 +96,8 @@ def annotate_pdf(input_path, issues):
         except Exception as e:
             print("[ANNOTATION ERROR]", e)
             continue
-
-    # --------------------------
-    # Save final annotated file
-    # --------------------------
+ 
+    # Save final annotated file 
     os.makedirs("annotated", exist_ok=True)
     file_id = uuid.uuid4().hex
     output_path = os.path.join("annotated", f"DPR_Reviewed_{file_id}.pdf")

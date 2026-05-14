@@ -15,28 +15,20 @@ from src.evaluation import DPRAssistant  # <-- updated assistant
 from src.web_search import duckduckgo_search
 
 load_dotenv()
-
-# ---------------------------------------------------
-# Initialize FastAPI
-# ---------------------------------------------------
+ 
+# Initialize FastAPI 
 app = FastAPI(title="Advanced DPR Intelligence API")
-
-# ---------------------------------------------------
-# Ensure required directories exist BEFORE mounting
-# ---------------------------------------------------
+ 
+# Ensure required directories exist BEFORE mounting 
 os.makedirs("uploads", exist_ok=True)
 os.makedirs("annotated", exist_ok=True)
 os.makedirs("dpr_faiss_store", exist_ok=True)
-
-# ---------------------------------------------------
-# Serve static folders
-# ---------------------------------------------------
+ 
+# Serve static folders 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/annotated", StaticFiles(directory="annotated"), name="annotated")
-
-# ---------------------------------------------------
-# CORS
-# ---------------------------------------------------
+ 
+# CORS 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
@@ -45,63 +37,45 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
-
-# ---------------------------------------------------
-# FAISS store + RAG engine setup
-# ---------------------------------------------------
+ 
+# FAISS store + RAG engine setup 
 PERSIST_DIR = "dpr_faiss_store"
 store = FaissVectorStore(PERSIST_DIR)
 rag = RAGSearch(persist_dir=PERSIST_DIR)
-
-# ---------------------------------------------------
-# DPR Assistant (AI Model)
-# ---------------------------------------------------
+ 
+# DPR Assistant (AI Model) 
 dpr_eval = DPRAssistant()   # uses updated evaluation + annotate_pdf internally
 
-
-# ----------------------------------------------------------
-# 📌 1. Upload DPR → Process → Evaluate → Annotate → Return JSON
-# ----------------------------------------------------------
+ 
+# 1. Upload DPR → Process → Evaluate → Annotate → Return JSON 
 @app.post("/upload_dpr")
 async def upload_dpr(file: UploadFile = File(...)):
-    try:
-        # -----------------------------
-        # SAVE THE PDF
-        # -----------------------------
+    try: 
+        # SAVE THE PDF 
         save_path = os.path.join("uploads", file.filename)
 
         with open(save_path, "wb") as f:
             f.write(await file.read())
 
         print(f"[INFO] PDF saved at: {save_path}")
-
-        # -----------------------------
-        # LOAD PDF INTO TEXT CHUNKS
-        # -----------------------------
+ 
+        # LOAD PDF INTO TEXT CHUNKS 
         docs = load_dpr_pdf(save_path)
-
-        # -----------------------------
-        # BUILD FAISS INDEX
-        # -----------------------------
+ 
+        # BUILD FAISS INDEX 
         store.build_from_documents(docs)
         store.save()
 
         # Make RAG use newly built FAISS
         rag.vectorstore = store
-
-        # -----------------------------
-        # MERGE ALL TEXT INTO SINGLE DOCUMENT
-        # -----------------------------
+ 
+        # MERGE ALL TEXT INTO SINGLE DOCUMENT 
         dpr_text = "\n\n".join([d.page_content for d in docs])
-
-        # -----------------------------
-        # PASS PDF PATH TO AI EVALUATOR
-        # -----------------------------
+ 
+        # PASS PDF PATH TO AI EVALUATOR 
         dpr_eval.input_pdf_path = save_path
-
-        # -----------------------------
-        # RUN FULL EVALUATION PIPELINE
-        # -----------------------------
+ 
+        # RUN FULL EVALUATION PIPELINE 
         result = dpr_eval.evaluate(dpr_text)
 
         # result contains:
@@ -123,10 +97,8 @@ async def upload_dpr(file: UploadFile = File(...)):
             content={"error": str(e)}
         )
 
-
-# ----------------------------------------------------------
-# 📌 2. Ask Questions About DPR (RAG)
-# ----------------------------------------------------------
+ 
+# 2. Ask Questions About DPR (RAG) 
 class QueryRequest(BaseModel):
     query: str
     top_k: int = 5
@@ -141,10 +113,8 @@ def ask(req: QueryRequest):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-
-# ----------------------------------------------------------
-# 📌 3. Web Search API
-# ----------------------------------------------------------
+ 
+# 3. Web Search API 
 @app.get("/search_web")
 def search_web(q: str):
     try:
@@ -153,10 +123,8 @@ def search_web(q: str):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-
-# ----------------------------------------------------------
-# 📌 4. Re-evaluate DPR (without re-uploading)
-# ----------------------------------------------------------
+ 
+# 4. Re-evaluate DPR (without re-uploading) 
 @app.post("/evaluate_dpr")
 def reevaluate():
     try:
@@ -176,18 +144,11 @@ def reevaluate():
     except Exception as e:
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
-
-
-# ----------------------------------------------------------
-# 📌 5. Health Check
-# ----------------------------------------------------------
+ 
+# 5. Health Check 
 @app.get("/health")
 def health():
     return {"status": "running"}
-
-
-# ----------------------------------------------------------
-# RUN
-# ----------------------------------------------------------
+ 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -12,7 +12,7 @@ from src.boq_parser import extract_boq_sections, parse_boq_from_text, boq_summar
 from src.gis_analysis import analyze_site
 from src.risk_simulator import run_monte_carlo
 
-# ✅ Correct import name
+# Correct import name
 from src.pdf_annotator import annotate_pdf  
 
 load_dotenv()
@@ -31,16 +31,12 @@ class DPRAssistant:
         self.compliance_checker = ComplianceChecker()
         self.benchmarks = CostBenchmarkEngine()
         self.input_pdf_path = None  # will be set from FastAPI
-
-    # ----------------------------------------------------------------
-    # TEXT CHUNKER
-    # ----------------------------------------------------------------
+ 
+    # TEXT CHUNKER 
     def _chunk(self, text, size=1500):
         return [text[i:i+size] for i in range(0, len(text), size)]
-
-    # ----------------------------------------------------------------
-    # PAGE-LEVEL ISSUE DETECTION
-    # ----------------------------------------------------------------
+ 
+    # PAGE-LEVEL ISSUE DETECTION 
     def detect_page_issues(self, page_text: str, page_num: int):
         prompt = f"""
 You are a Government DPR auditor performing page-level analysis.
@@ -63,17 +59,13 @@ Return JSON ONLY.
             return json.loads(resp)
         except:
             return []
-
-    # ----------------------------------------------------------------
-    # MAIN EVALUATION PIPELINE
-    # ----------------------------------------------------------------
+ 
+    # MAIN EVALUATION PIPELINE 
     def evaluate(self, dpr_text: str):
 
         print("[INFO] Running page-by-page issue detection...")
-
-        # --------------------------
-        # Detect issues per page
-        # --------------------------
+ 
+        # Detect issues per page 
         pdf = fitz.open(self.input_pdf_path)
         issues_for_pdf = []
 
@@ -89,10 +81,8 @@ Return JSON ONLY.
                 })
 
         pdf.close()
-
-        # --------------------------
-        # Chunk for LLM processing
-        # --------------------------
+ 
+        # Chunk for LLM processing 
         chunks = self._chunk(dpr_text)
         global_context = "\n".join(chunks[:3])
 
@@ -138,16 +128,12 @@ Write 200–300 words. End with Score (1–10).
 
             resp = self.llm.invoke([mod_prompt]).content.strip()
             module_summaries.append(f"## {title}\n{resp}\n")
-
-        # --------------------------
-        # Multi-agent system
-        # --------------------------
+ 
+        # Multi-agent system 
         print("[INFO] Multi-agent review...")
         agent_summary = self.agents.run_full_evaluation(dpr_text)
-
-        # --------------------------
-        # BOQ / GIS / RISK
-        # --------------------------
+ 
+        # BOQ / GIS / RISK 
         boq_text = extract_boq_sections(dpr_text)
         boq_items = parse_boq_from_text(boq_text)
         boq_stats = boq_summary(boq_items)
@@ -158,10 +144,8 @@ Write 200–300 words. End with Score (1–10).
 
         base_cost = boq_stats.get("total_estimated_cost", 50000000)
         risk_summary = run_monte_carlo(base_cost, base_duration_days=365, n_sims=2000)
-
-        # --------------------------
-        # Final LLM synthesis
-        # --------------------------
+ 
+        # Final LLM synthesis 
         final_prompt = f"""
 Synthesize:
 - Module evaluations
@@ -181,13 +165,11 @@ Write a 600-token official DPR evaluation report:
 """
 
         final_report = self.llm.invoke([final_prompt]).content.strip()
-
-        # --------------------------
-        # GENERATE HIGHLIGHTED PDF
-        # --------------------------
+ 
+        # GENERATE HIGHLIGHTED PDF 
         print("[INFO] Creating highlighted PDF...")
 
-        # ❗ FIX: Correct signature
+        # FIX: Correct signature
         highlighted_pdf = annotate_pdf(
             input_path=self.input_pdf_path,   # MATCHES YOUR FUNCTION
             issues=issues_for_pdf

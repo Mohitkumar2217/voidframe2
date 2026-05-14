@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 
 async function generatePasswords() {
-  console.log('🔐 Generating Password Hashes for DPR Assessment System\n');
+  console.log('Generating Password Hashes for DPR Assessment System\n');
   
   const passwords = [
     { label: 'MDoNER Admin Password (MDoNER@2025)', plain: 'MDoNER@2025' },

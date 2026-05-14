@@ -48,14 +48,14 @@ const dummyUsers = [
 
 async function seedUsers() {
   try {
-    console.log("⏳ Connecting to MongoDB...");
+    console.log("Connecting to MongoDB...");
     await mongoose.connect(MONGO_URI);
-    console.log("✅ Connected to DB!");
+    console.log("Connected to DB!");
 
     for (let user of dummyUsers) {
       const exists = await User.findOne({ email: user.email });
       if (exists) {
-        console.log(`⚠️ User already exists: ${user.email}`);
+        console.log(`User already exists: ${user.email}`);
         continue;
       }
 
@@ -63,13 +63,13 @@ async function seedUsers() {
       user.password = hashedPassword;
 
       await User.create(user);
-      console.log(`✔️ Inserted: ${user.email}`);
+      console.log(`Inserted: ${user.email}`);
     }
 
-    console.log("🎉 Dummy users inserted successfully!");
+    console.log("Dummy users inserted successfully!");
     process.exit(0);
   } catch (err) {
-    console.error("❌ Error seeding users:", err);
+    console.error("Error seeding users:", err);
     process.exit(1);
   }
 }

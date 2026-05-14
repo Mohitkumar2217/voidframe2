@@ -41,11 +41,9 @@ class MultiAgentSystem:
             model=self.model,
             groq_api_key=GROQ_API_KEY,
             max_tokens=max_tokens
-        )
+        ) 
 
-    # -------------------------
-    # Engineer Agent
-    # -------------------------
+    # Engineer Agent 
     def engineer_agent(self, dpr_context: str) -> str:
         ctx = _trim(dpr_context)
         if self.strong_mode:
@@ -90,10 +88,8 @@ Output as bullets and one score line.
 """
         resp = self.llm.invoke([prompt]).content.strip()
         return f"Engineer Agent Output:\n{resp}"
-
-    # -------------------------
-    # Finance Agent
-    # -------------------------
+ 
+    # Finance Agent 
     def finance_agent(self, dpr_context: str) -> str:
         ctx = _trim(dpr_context)
         if self.strong_mode:
@@ -137,10 +133,8 @@ Output concise.
 """
         resp = self.llm.invoke([prompt]).content.strip()
         return f"Finance Agent Output:\n{resp}"
-
-    # -------------------------
-    # Risk Agent
-    # -------------------------
+ 
+    # Risk Agent 
     def risk_agent(self, dpr_context: str, monte_carlo_summary: Dict[str, Any] | None = None) -> str:
         ctx = _trim(dpr_context)
         mc_snip = ""
@@ -185,10 +179,8 @@ Output concise.
 """
         resp = self.llm.invoke([prompt]).content.strip()
         return f"Risk Agent Output:\n{resp}"
-
-    # -------------------------
-    # Policy Agent
-    # -------------------------
+ 
+    # Policy Agent 
     def policy_agent(self, dpr_context: str) -> str:
         ctx = _trim(dpr_context)
         if self.strong_mode:
@@ -225,10 +217,8 @@ Tasks:
 """
         resp = self.llm.invoke([prompt]).content.strip()
         return f"Policy Agent Output:\n{resp}"
-
-    # -------------------------
-    # Reviewer / Aggregator Agent
-    # -------------------------
+ 
+    # Reviewer / Aggregator Agent 
     def reviewer_agent(self, engineer_out: str, finance_out: str, risk_out: str, policy_out: str) -> str:
         """
         Combine agent outputs into a short consolidated evaluation.
@@ -264,10 +254,8 @@ Keep output concise and actionable.
 """
         resp = self.llm.invoke([prompt]).content.strip()
         return f"Reviewer Agent Output:\n{resp}"
-
-    # -------------------------
-    # High-level helper: run all agents and return consolidated result
-    # -------------------------
+ 
+    # High-level helper: run all agents and return consolidated result 
     def run_full_evaluation(self, dpr_text: str, monte_carlo_summary: Dict[str, Any] | None = None) -> str:
         """
         Runs all agents sequentially (engineer, finance, risk, policy) and then the reviewer.
