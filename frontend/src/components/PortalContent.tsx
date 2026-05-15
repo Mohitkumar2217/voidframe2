@@ -5,10 +5,8 @@ import { useRouter } from 'next/navigation';
 import { auth, User } from '@/lib/auth';
 import Navigation from '@/components/Navigation';
 import { useDocuments, UploadedDocument } from '@/contexts/DocumentContext';
-
-/* ======================================================================
-   WRAPPER – DECIDES WHICH DASHBOARD TO SHOW
-====================================================================== */
+ 
+  //  WRAPPER – DECIDES WHICH DASHBOARD TO SHOW 
 const PortalContent: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,10 +40,8 @@ const PortalContent: React.FC = () => {
     </div>
   );
 };
-
-/* ======================================================================
-   ADMIN (MDoNER) DASHBOARD
-====================================================================== */
+ 
+  //  ADMIN (MDoNER) DASHBOARD 
 const MDoNERDashboard: React.FC = () => {
   const { getAllDocuments, updateDocumentStatus } = useDocuments();
   const [selectedFilter, setSelectedFilter] = useState<'all' | UploadedDocument['status']>('all');
@@ -162,10 +158,8 @@ const MDoNERDashboard: React.FC = () => {
     </div>
   );
 };
-
-/* ======================================================================
-   CLIENT DASHBOARD (UPLOAD + AI ANALYSIS)
-====================================================================== */
+ 
+  //  CLIENT DASHBOARD (UPLOAD + AI ANALYSIS) 
 const ClientDashboard: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] =

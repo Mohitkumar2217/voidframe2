@@ -106,7 +106,7 @@ export default function ChatbotPage() {
         </div>
       </div>
 
-      {/* ✨ Floating Input Bar — Improved Placement & UI */}
+      {/* Floating Input Bar — Improved Placement & UI */}
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] md:w-[70%] lg:w-[50%]">
         <div className="flex gap-3 bg-gray-900/90 backdrop-blur-xl border border-gray-700 shadow-2xl rounded-2xl px-4 py-3">
 

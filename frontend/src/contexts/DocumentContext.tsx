@@ -1,10 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-
-/* -----------------------------------------
-   DOCUMENT TYPE (Updated with evaluationData)
------------------------------------------- */
+ 
+  //  DOCUMENT TYPE (Updated with evaluationData) 
 export interface UploadedDocument {
   id: string;
   name: string;
@@ -26,12 +24,10 @@ export interface UploadedDocument {
 
   reviewDate?: string;
 
-  evaluationData?: Record<string, unknown>; // ⭐ NEW FIELD for AI results
+  evaluationData?: Record<string, unknown>; // NEW FIELD for AI results
 }
-
-/* -----------------------------------------
-   CONTEXT TYPE
------------------------------------------- */
+ 
+  //  CONTEXT TYPE 
 interface DocumentContextType {
   documents: UploadedDocument[];
   addDocument: (document: Omit<UploadedDocument, "id">) => void;
@@ -44,10 +40,8 @@ interface DocumentContextType {
   getClientDocuments: (clientEmail: string) => UploadedDocument[];
   getAllDocuments: () => UploadedDocument[];
 }
-
-/* -----------------------------------------
-   INIT CONTEXT
------------------------------------------- */
+ 
+  //  INIT CONTEXT 
 const DocumentContext = createContext<DocumentContextType | undefined>(
   undefined
 );
@@ -59,20 +53,16 @@ export const useDocuments = () => {
   }
   return context;
 };
-
-/* -----------------------------------------
-   PROVIDER
------------------------------------------- */
+ 
+  //  PROVIDER 
 export const DocumentProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [documents, setDocuments] = useState<UploadedDocument[]>([
     // Example / sample data
   ]);
-
-  /* -----------------------------------------
-       ADD A DOCUMENT
-  ------------------------------------------ */
+ 
+      //  ADD A DOCUMENT 
   const addDocument = (document: Omit<UploadedDocument, "id">) => {
     const newDocument: UploadedDocument = {
       ...document,
@@ -88,10 +78,8 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({
 
     setDocuments((prev) => [newDocument, ...prev]);
   };
-
-  /* -----------------------------------------
-       UPDATE STATUS (Admin Only)
-  ------------------------------------------ */
+ 
+      //  UPDATE STATUS (Admin Only) 
   const updateDocumentStatus = (
     id: string,
     status: UploadedDocument["status"],
@@ -112,17 +100,13 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({
       )
     );
   };
-
-  /* -----------------------------------------
-        FILTER BY CLIENT
-  ------------------------------------------ */
+ 
+  // FILTER BY CLIENT 
   const getClientDocuments = (clientEmail: string) => {
     return documents.filter((doc) => doc.uploadedBy.email === clientEmail);
   };
-
-  /* -----------------------------------------
-        RETURN ALL
-  ------------------------------------------ */
+ 
+  // RETURN ALL 
   const getAllDocuments = () => documents;
 
   return (

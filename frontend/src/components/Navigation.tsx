@@ -13,10 +13,8 @@ const Navigation = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-
-  //-------------------------------------
-  // Authentication Check
-  //-------------------------------------
+ 
+  // Authentication Check 
   useEffect(() => {
     const checkAuth = () => {
       setIsAuthenticated(auth.isAuthenticated());
